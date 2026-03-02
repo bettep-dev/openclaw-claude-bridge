@@ -24,7 +24,14 @@
     "discord",
     "slack"
   ],
-  "author": "bettep <hongdaesik88@gmail.com> (https://bettep.org)",
+  "bugs": {
+    "email": "hongdaesik88@gmail.com"
+  },
+  "author": {
+    "name": "Bettep",
+    "email": "hongdaesik88@gmail.com"
+  },
+  "homepage": "https://github.com/bettep-dev/openclaw-claude-bridge",
   "license": "MIT",
   "repository": {
     "type": "git",
