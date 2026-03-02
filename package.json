@@ -1,6 +1,6 @@
 {
   "name": "openclaw-claude-bridge",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Bridge OpenClaw messaging channels to Claude CLI via tmux persistent sessions",
   "main": "./lib/onboard.js",
   "bin": {
@@ -31,10 +31,10 @@
     "name": "Bettep",
     "email": "hongdaesik88@gmail.com"
   },
-  "homepage": "https://github.com/bettep-dev/openclaw-claude-bridge",
+  "homepage": "https://bettep.org",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openclaw/openclaw-claude-bridge.git"
+    "url": "https://github.com/bettep-dev/openclaw-claude-bridge"
   }
 }
