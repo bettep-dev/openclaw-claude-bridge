@@ -16,13 +16,14 @@ User (Telegram/Discord/Slack/...)
 
 ## Highlights
 
-- **2-command setup** -- install and run the onboard wizard, done
-- **Persistent sessions** -- Claude keeps context across messages via tmux
-- **Multi-channel** -- works with Telegram, Discord, Slack, WhatsApp, Signal, IRC, and more
-- **Auto-healing daemon** -- session restarts automatically if it dies
-- **macOS & Linux** -- LaunchAgent or systemd, auto-detected
+- **2-command setup** — install and run the onboard wizard, done
+- **Persistent sessions** — Claude keeps context across messages via tmux
+- **Multi-channel** — works with Telegram, Discord, Slack, WhatsApp, Signal, IRC, and more
+- **Auto-healing daemon** — session restarts automatically if it dies
+- **macOS & Linux** — LaunchAgent or systemd, auto-detected
 
-> **Note:** Windows is not supported (requires tmux).
+> [!WARNING]
+> Windows is not supported (requires tmux).
 
 ## Quick Start
 
@@ -40,49 +41,51 @@ That's it. Send `/cc "hello"` from your chat to verify.
 
 ## Prerequisites
 
+> [!IMPORTANT]
 > OpenClaw and Claude CLI must be installed **before** running this tool.
 
-| Dependency | Install | Docs |
-|---|---|---|
-| [OpenClaw](https://openclaw.ai) | `npm i -g openclaw` | https://openclaw.ai |
+| Dependency                                              | Install                              | Docs                                      |
+| ------------------------------------------------------- | ------------------------------------ | ----------------------------------------- |
+| [OpenClaw](https://openclaw.ai)                         | `npm i -g openclaw`                  | https://openclaw.ai                       |
 | [Claude CLI](https://github.com/anthropics/claude-code) | `npm i -g @anthropic-ai/claude-code` | https://github.com/anthropics/claude-code |
 
 [tmux](https://github.com/tmux/tmux) is installed automatically during `onboard` if missing.
 
-> **Compatibility:** This package depends on the CLI interfaces of OpenClaw and Claude CLI. If either tool releases a breaking update, check for a compatible version of `openclaw-claude-bridge`.
+> [!CAUTION]
+> This package depends on the CLI interfaces of OpenClaw and Claude CLI. If either tool releases a breaking update, check for a compatible version of `openclaw-claude-bridge`.
 
 ## Usage
 
-Arguments after `/cc` and `/ccn` **must** be wrapped in double quotes.
+| Command | Description |
+|---|---|
+| `/cc "message"` | Send to existing session (keeps context) |
+| `/ccn "message"` | Create new session (fresh context) |
+| `/ccu` | Check Claude usage/cost |
 
-```
-/cc "fix the login bug"        # send to existing session (keeps context)
-/ccn "refactor the auth module" # create new session (fresh context)
-/ccu                            # check Claude usage/cost
-```
-
-```
-# Correct
-/cc "deploy the app to production"
-
-# Wrong -- only the first word is sent
-/cc deploy the app to production
-```
+> [!WARNING]
+> Arguments after `/cc` and `/ccn` **must** be wrapped in double quotes.
+> Without quotes, only the first word is sent as the instruction.
+>
+> ```
+> /cc "deploy the app to production"   # Correct
+> /cc deploy the app to production     # Wrong
+> ```
 
 ## Supported Channels
 
 ### Built-in
 
-| Channel | Description |
-|---|---|
-| telegram | Telegram Bot API |
-| discord | Discord Bot |
-| slack | Slack Socket Mode |
+| Channel  | Description            |
+| -------- | ---------------------- |
+| telegram | Telegram Bot API       |
+| discord  | Discord Bot            |
+| slack    | Slack Socket Mode      |
 | whatsapp | WhatsApp Web (Baileys) |
-| signal | Signal via signal-cli |
-| irc | Classic IRC |
+| signal   | Signal via signal-cli  |
+| irc      | Classic IRC            |
 
-> Only Telegram has been tested by the maintainer. Other channels are supported in theory -- please [report issues](https://github.com/bettep-dev/openclaw-claude-bridge/issues) if you encounter problems.
+> [!NOTE]
+> Only Telegram has been tested by the maintainer. Other channels are supported in theory — please [report issues](https://github.com/bettep-dev/openclaw-claude-bridge/issues) if you encounter problems.
 
 ### Plugins
 
@@ -97,11 +100,11 @@ openclaw plugins install teams
 
 The target ID tells Claude where to send responses. It varies by channel:
 
-| Channel | Example | How to find |
-|---|---|---|
-| Telegram | `123456789` | OpenClaw dashboard or `@userinfobot` |
-| Discord | `123456789012345678` | Right-click channel > Copy Channel ID |
-| Slack | `#general` | Channel name in Slack |
+| Channel  | Example              | How to find                           |
+| -------- | -------------------- | ------------------------------------- |
+| Telegram | `123456789`          | OpenClaw dashboard or `@userinfobot`  |
+| Discord  | `123456789012345678` | Right-click channel > Copy Channel ID |
+| Slack    | `#general`           | Channel name in Slack                 |
 
 During setup, the wizard opens `http://127.0.0.1:18789/channels` where you can find your target ID.
 
@@ -109,8 +112,8 @@ During setup, the wizard opens `http://127.0.0.1:18789/channels` where you can f
 
 ```
                ┌─────────────────────────────────┐
-               │   LaunchAgent / systemd (30s)    │
-               │   runs claude-session.sh         │
+               │   LaunchAgent / systemd (30s)   │
+               │   runs claude-session.sh        │
                └──────────────┬──────────────────┘
                               │ creates if missing
                               v
@@ -131,12 +134,12 @@ During setup, the wizard opens `http://127.0.0.1:18789/channels` where you can f
 
 ## What Gets Installed
 
-| Component | Location | Purpose |
-|---|---|---|
-| Scripts (4) | `~/.openclaw/scripts/` | Session management and message relay |
-| Skills (3) | `~/.openclaw/workspace/skills/` | OpenClaw skill definitions (cc, ccn, ccu) |
-| CLAUDE.md | `~/.openclaw/workspace/` | System prompt for Claude CLI |
-| Daemon | LaunchAgent or systemd | Keeps tmux session alive (30s interval) |
+| Component   | Location                        | Purpose                                   |
+| ----------- | ------------------------------- | ----------------------------------------- |
+| Scripts (4) | `~/.openclaw/scripts/`          | Session management and message relay      |
+| Skills (3)  | `~/.openclaw/workspace/skills/` | OpenClaw skill definitions (cc, ccn, ccu) |
+| CLAUDE.md   | `~/.openclaw/workspace/`        | System prompt for Claude CLI              |
+| Daemon      | LaunchAgent or systemd          | Keeps tmux session alive (30s interval)   |
 
 Existing files are patched, not replaced. Existing `CLAUDE.md` is backed up as `CLAUDE.{date}.md`.
 
@@ -194,8 +197,8 @@ openclaw-claude-bridge onboard
 
 ## Acknowledgments
 
-- [OpenClaw](https://openclaw.ai) -- multi-channel messaging gateway
-- [Claude CLI](https://github.com/anthropics/claude-code) -- Anthropic's CLI for Claude
+- [OpenClaw](https://openclaw.ai) — multi-channel messaging gateway
+- [Claude CLI](https://github.com/anthropics/claude-code) — Anthropic's CLI for Claude
 
 ## License
 
