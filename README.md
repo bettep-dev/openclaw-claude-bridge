@@ -6,6 +6,8 @@
 [![license](https://img.shields.io/npm/l/openclaw-claude-bridge)](LICENSE)
 [![node](https://img.shields.io/node/v/openclaw-claude-bridge)](package.json)
 
+A bridge that connects messaging channels (Telegram, Discord, Slack, etc.) to Claude CLI through [OpenClaw](https://openclaw.ai) as a gateway. Built to use your existing OAuth-based Claude subscription directly — **no separate API billing required**.
+
 ```
 User (Telegram/Discord/Slack/...)
     -> OpenClaw Gateway
