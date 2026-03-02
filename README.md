@@ -22,7 +22,7 @@ User (Telegram/Discord/Slack/...)
 - **Auto-healing daemon** — session restarts automatically if it dies
 - **macOS & Linux** — LaunchAgent or systemd, auto-detected
 
-> [!WARNING]
+> **Warning**
 > Windows is not supported (requires tmux).
 
 ## Quick Start
@@ -41,7 +41,7 @@ That's it. Send `/cc "hello"` from your chat to verify.
 
 ## Prerequisites
 
-> [!IMPORTANT]
+> **Important**
 > OpenClaw and Claude CLI must be installed **before** running this tool.
 
 | Dependency                                              | Install                              | Docs                                      |
@@ -51,7 +51,7 @@ That's it. Send `/cc "hello"` from your chat to verify.
 
 [tmux](https://github.com/tmux/tmux) is installed automatically during `onboard` if missing.
 
-> [!CAUTION]
+> **Caution**
 > This package depends on the CLI interfaces of OpenClaw and Claude CLI. If either tool releases a breaking update, check for a compatible version of `openclaw-claude-bridge`.
 
 ## Usage
@@ -62,7 +62,7 @@ That's it. Send `/cc "hello"` from your chat to verify.
 | `/ccn "message"` | Create new session (fresh context) |
 | `/ccu` | Check Claude usage/cost |
 
-> [!WARNING]
+> **Warning**
 > Arguments after `/cc` and `/ccn` **must** be wrapped in double quotes.
 > Without quotes, only the first word is sent as the instruction.
 >
@@ -84,7 +84,7 @@ That's it. Send `/cc "hello"` from your chat to verify.
 | signal   | Signal via signal-cli  |
 | irc      | Classic IRC            |
 
-> [!NOTE]
+> **Note**
 > Only Telegram has been tested by the maintainer. Other channels are supported in theory — please [report issues](https://github.com/bettep-dev/openclaw-claude-bridge/issues) if you encounter problems.
 
 ### Plugins
