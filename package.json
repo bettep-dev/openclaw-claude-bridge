@@ -1,6 +1,6 @@
 {
   "name": "openclaw-claude-bridge",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Bridge OpenClaw messaging channels to Claude CLI via tmux persistent sessions",
   "main": "./lib/onboard.js",
   "bin": {
