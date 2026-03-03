@@ -8,8 +8,6 @@
 
 A bridge that connects messaging channels (Telegram, Discord, Slack, etc.) to Claude CLI through [OpenClaw](https://openclaw.ai) as a gateway. Built to use your existing OAuth-based Claude subscription directly — **no separate API billing required**.
 
-![](https://cdn.bettep.org/openclaw/1.webp)
-
 ```
 User (Telegram/Discord/Slack/...)
     -> OpenClaw Gateway
@@ -17,6 +15,10 @@ User (Telegram/Discord/Slack/...)
             -> response via openclaw message send
                 -> User
 ```
+
+<p align="center">
+  <img src="SAMPLE.webp" alt="Telegram demo" width="400" />
+</p>
 
 ## Highlights
 
