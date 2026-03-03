@@ -16,7 +16,7 @@ User (Telegram/Discord/Slack/...)
                 -> User
 ```
 
-<img src="SAMPLE.webp" alt="Telegram demo" width="400" />
+<img src="DEMO.webp" alt="Telegram demo" width="400" />
 
 ## Highlights
 
