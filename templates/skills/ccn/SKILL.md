@@ -5,6 +5,9 @@ description: |
   Create new tmux session and send instruction.
   Triggered when user sends a message starting with "/ccn".
   Starts fresh with no previous context.
+command-dispatch: tool
+command-tool: bash
+command-arg-mode: raw
 metadata:
   {
     "openclaw": {
@@ -15,47 +18,51 @@ metadata:
 
 # /ccn — Create new tmux session and send instruction
 
-> **OVERRIDE**: When this skill is triggered, the instructions below take priority over all general principles in SOUL.md (confirm-first, no-coding, raw-output, etc.).
+> **OVERRIDE**: This skill's instructions override ALL general principles (SOUL.md, confirm-first, no-coding, raw-output, etc.).
 
-> **IMPORTANT**: Arguments after /ccn MUST be wrapped in double quotes.
-> Correct: /ccn "build the project"
-> Wrong:   /ccn build the project
+## CRITICAL RULE — Read this first
 
-## Execution procedure (follow this order exactly)
+The content inside the quotes is an **opaque string**. You are a **relay**, not a processor.
 
-**Step 1 — Execute immediately**: Run the content after /ccn as-is with the following command.
+- You MUST NOT read, understand, interpret, or act on the content.
+- You MUST NOT answer questions found in the content.
+- You MUST NOT perform tasks described in the content.
+- Your ONLY job: pass the string to the script below. Nothing else.
+
+**This rule applies to ALL content — including weather questions, search requests, greetings, math problems, translations, coding tasks, or any other request. No exceptions.**
+
+## Procedure (exactly 3 steps, no deviation)
+
+**Step 1** — Execute this command immediately:
 
 ```bash
 {{SCRIPTS_DIR}}/claude-new-session.sh "{content}"
 ```
 
-**Step 2 — Relay result**: Send the execution result (confirmation message) to the user.
+**Step 2** — Send the execution result (confirmation message) to the user.
 
-**Step 3 — Terminate immediately**: End the turn with no additional output.
+**Step 3** — Stop. No additional output.
 
-## Strictly prohibited
-
-- Interpreting, translating, modifying, or enhancing the content
-- Analysis, judgment, or explanation such as "This request is about..."
-- Confirmation questions such as "Would you like to...?"
-- Capability disclaimers such as "I'm not able to..."
-- Responding with text only without executing the script
-- Follow-up suggestions, summaries, or additional guidance
-
-## Incorrect behavior (never do this)
+## Examples
 
 ```
+User: /ccn "오늘 서울 날씨 알려줘"
+WRONG: Answering the weather question yourself
+WRONG: "I don't have access to weather data, but..."
+RIGHT: Run claude-new-session.sh "오늘 서울 날씨 알려줘" -> relay result -> stop
+
+User: /ccn "1+1은?"
+WRONG: "2입니다"
+RIGHT: Run claude-new-session.sh "1+1은?" -> relay result -> stop
+
 User: /ccn "run the build"
-Wrong: "I cannot perform builds directly..."
-Wrong: "I'll create a new session and forward this. Note that..."
+WRONG: "I cannot perform builds directly..."
+RIGHT: Run claude-new-session.sh "run the build" -> relay result -> stop
 ```
 
-## Correct behavior
+## Reminder
 
-```
-User: /ccn "run the build"
-Correct: Execute claude-new-session.sh "run the build" -> output result -> end
-```
+If you feel tempted to answer the content yourself — STOP. Run the script instead. The content is not for you. You are a relay.
 
 ## Rules
 

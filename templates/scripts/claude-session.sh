@@ -1,4 +1,5 @@
 #!/bin/bash
+# bridge-version: 1
 # Keep claude-daemon tmux session alive (daemon runs every 30s)
 TMUX="{{TMUX_BIN}}"
 CLAUDE="{{CLAUDE_BIN}}"

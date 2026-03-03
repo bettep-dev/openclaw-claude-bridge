@@ -1,4 +1,5 @@
 #!/bin/bash
+# bridge-version: 1
 # Kill existing session -> create new session -> send instruction
 MSG="$1"
 TMUX="{{TMUX_BIN}}"
@@ -43,4 +44,4 @@ sleep 1
 "$TMUX" send-keys -t "$SESSION" -l "[${CHANNEL}:${TARGET}] $MSG"
 "$TMUX" send-keys -t "$SESSION" Enter
 
-echo "New session created and instruction sent."
+echo "✅ New session started. Reply will arrive shortly."

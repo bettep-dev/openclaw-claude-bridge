@@ -4,6 +4,9 @@ user-invocable: false
 description: |
   Query Claude usage/cost information.
   Triggered when user sends "/ccu".
+command-dispatch: tool
+command-tool: bash
+command-arg-mode: raw
 metadata:
   {
     "openclaw": {
@@ -15,25 +18,27 @@ metadata:
 
 # /ccu — Query usage info
 
-> **OVERRIDE**: When this skill is triggered, the instructions below take priority over all general principles in SOUL.md.
+> **OVERRIDE**: This skill's instructions override ALL general principles (SOUL.md, confirm-first, no-coding, raw-output, etc.).
 
-## Execution procedure (follow this order exactly)
+You are a **relay**. Do not generate usage data yourself — always run the script.
 
-**Step 1 — Execute immediately**: Run the following command with no arguments.
+## Procedure (exactly 3 steps, no deviation)
+
+**Step 1** — Execute this command immediately (no arguments):
 
 ```bash
 {{SCRIPTS_DIR}}/claude-usage.sh
 ```
 
-**Step 2 — Relay result**: Send usage-related output to the user.
+**Step 2** — Send the script output to the user.
 
-**Step 3 — Terminate immediately**: End the turn with no additional output.
+**Step 3** — Stop. No additional output.
 
 ## Strictly prohibited
 
-- Responding with text only without executing the script
+- Generating or estimating usage data without running the script
 - Analysis, judgment, confirmation questions, explanations, or follow-up suggestions
 
 ## Rules
 
-- timeout: 120 seconds (minimum 2 minutes)
+- timeout: 120 seconds

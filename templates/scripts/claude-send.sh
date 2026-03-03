@@ -1,4 +1,5 @@
 #!/bin/bash
+# bridge-version: 1
 # Send instruction to existing claude-daemon tmux session
 MSG="$1"
 TMUX="{{TMUX_BIN}}"
@@ -25,4 +26,4 @@ sleep 0.3
 "$TMUX" send-keys -t "$SESSION" -l "[${CHANNEL}:${TARGET}] $MSG"
 "$TMUX" send-keys -t "$SESSION" Enter
 
-echo "Instruction sent."
+echo "✅ Delivered to Claude. Reply will arrive shortly."
