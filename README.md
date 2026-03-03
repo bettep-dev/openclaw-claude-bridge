@@ -8,6 +8,8 @@
 
 A bridge that connects messaging channels (Telegram, Discord, Slack, etc.) to Claude CLI through [OpenClaw](https://openclaw.ai) as a gateway. Built to use your existing OAuth-based Claude subscription directly — **no separate API billing required**.
 
+![](https://cdn.bettep.org/openclaw/1.webp)
+
 ```
 User (Telegram/Discord/Slack/...)
     -> OpenClaw Gateway
@@ -58,11 +60,11 @@ That's it. Send `/cc "hello"` from your chat to verify.
 
 ## Usage
 
-| Command | Description |
-|---|---|
-| `/cc "message"` | Send to existing session (keeps context) |
-| `/ccn "message"` | Create new session (fresh context) |
-| `/ccu` | Check Claude usage/cost |
+| Command          | Description                              |
+| ---------------- | ---------------------------------------- |
+| `/cc "message"`  | Send to existing session (keeps context) |
+| `/ccn "message"` | Create new session (fresh context)       |
+| `/ccu`           | Check Claude usage/cost                  |
 
 > **Warning**
 > Arguments after `/cc` and `/ccn` **must** be wrapped in double quotes.
