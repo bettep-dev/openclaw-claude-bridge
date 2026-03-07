@@ -12,11 +12,13 @@ const SCRIPT_MAP: Record<string, string> = {
 const REQUIRES_ARG = new Set(["cc", "ccn"]);
 const EXEC_TIMEOUT = 120_000;
 
+const DELIVERY_MSG = "🔗 Claude CLI will reply shortly.";
+
 const SILENT_PROMPT =
   "SYSTEM OVERRIDE: The previous user message was intercepted by the claude-bridge plugin and is already being handled externally. " +
-  "You MUST NOT process, interpret, or respond to it. Output ONLY this exact text, nothing else: 🔗 Delivered to Claude CLI. Reply will arrive shortly.";
+  `You MUST NOT process, interpret, or respond to it. Output ONLY this exact text, nothing else: ${DELIVERY_MSG}`;
 
-// Track active bridge suppression with timestamp (expires after 30s)
+// NOTE: Single-user assumption — concurrent users may see cross-suppression
 let bridgeSuppressUntil = 0;
 
 export default function register(api: OpenClawPluginApi) {
@@ -34,7 +36,7 @@ export default function register(api: OpenClawPluginApi) {
     const lastUserText = extractLastUserText(event.messages);
 
     if (lastUserText && PREFIX_RE.test(lastUserText)) {
-      bridgeSuppressUntil = Date.now() + 30_000;
+      bridgeSuppressUntil = Date.now() + EXEC_TIMEOUT + 5_000;
       return { systemPrompt: SILENT_PROMPT, prependContext: SILENT_PROMPT };
     }
   });
@@ -43,7 +45,7 @@ export default function register(api: OpenClawPluginApi) {
   // Replace LLM output with delivery confirmation while bridge suppression is active
   api.on("message_sending", async (_event, _ctx) => {
     if (Date.now() < bridgeSuppressUntil) {
-      return { content: "🔗 Delivered to Claude CLI. Reply will arrive shortly." };
+      return { content: DELIVERY_MSG };
     }
   });
 
