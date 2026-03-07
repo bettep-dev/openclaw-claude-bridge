@@ -70,11 +70,18 @@ export default function register(api: OpenClawPluginApi) {
     const scriptPath = `${scriptsDir}/${script}`;
     const args = arg ? [arg] : [];
 
-    execFile(scriptPath, args, { timeout: EXEC_TIMEOUT }, (error, _stdout, stderr) => {
-      if (error) {
-        api.logger.error?.(`[claude-bridge] ${script} failed: ${stderr?.trim() || error.message}`);
-      }
-    });
+    execFile(
+      scriptPath,
+      args,
+      { timeout: EXEC_TIMEOUT },
+      (error, _stdout, stderr) => {
+        if (error) {
+          api.logger.error?.(
+            `[claude-bridge] ${script} failed: ${stderr?.trim() || error.message}`,
+          );
+        }
+      },
+    );
   });
 }
 
@@ -96,8 +103,14 @@ function extractLastUserText(messages: unknown): string | undefined {
       raw = m.content;
     } else if (Array.isArray(m.content)) {
       for (const block of m.content) {
-        if (typeof block === "string") { raw = block; break; }
-        if (block?.type === "text" && typeof block.text === "string") { raw = block.text; break; }
+        if (typeof block === "string") {
+          raw = block;
+          break;
+        }
+        if (block?.type === "text" && typeof block.text === "string") {
+          raw = block.text;
+          break;
+        }
       }
     } else if (typeof m.text === "string") {
       raw = m.text;
