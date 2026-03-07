@@ -1,0 +1,10 @@
+{
+  "name": "claude-bridge",
+  "version": "2.0.0",
+  "private": true,
+  "description": "OpenClaw plugin: route prefix messages to Claude CLI via tmux",
+  "type": "module",
+  "openclaw": {
+    "extensions": ["./index.ts"]
+  }
+}

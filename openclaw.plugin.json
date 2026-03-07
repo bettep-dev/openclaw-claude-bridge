@@ -1,0 +1,38 @@
+{
+  "id": "claude-bridge",
+  "name": "Claude Bridge",
+  "description": "Route @cc/@ccn/@ccu prefix messages to Claude CLI via tmux, suppressing the default LLM response.",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "scriptsDir": {
+        "type": "string",
+        "description": "Path to bridge shell scripts directory"
+      },
+      "channel": {
+        "type": "string",
+        "description": "Delivery channel (telegram, discord, slack, etc.)"
+      },
+      "targetId": {
+        "type": "string",
+        "description": "Delivery target ID for replies"
+      }
+    },
+    "required": ["scriptsDir"]
+  },
+  "uiHints": {
+    "scriptsDir": {
+      "label": "Scripts Directory",
+      "help": "Absolute path to the directory containing claude-send.sh, claude-new-session.sh, claude-usage.sh"
+    },
+    "channel": {
+      "label": "Channel",
+      "help": "Channel for sending replies (e.g. telegram)"
+    },
+    "targetId": {
+      "label": "Target ID",
+      "help": "Target ID for sending replies (e.g. Telegram chat ID)"
+    }
+  }
+}
