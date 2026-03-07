@@ -6,7 +6,7 @@
 
 Bridge OpenClaw messaging channels (Telegram, Discord, Slack, etc.) to Claude CLI via persistent tmux sessions.
 
-Uses your existing OAuth-based Claude subscription directly — no separate API billing required.
+Routes commands directly to the Claude CLI in your terminal, avoiding OAuth issues and separate API costs.
 
 <img src="DEMO_1.png" alt="Telegram demo 1" width="400" /> 
 <img src="DEMO_2.png" alt="Telegram demo 2" width="400" />
@@ -14,8 +14,6 @@ Uses your existing OAuth-based Claude subscription directly — no separate API 
 ## How It Works
 
 Messages prefixed with `@cc` or `/cc` are intercepted by an OpenClaw **plugin** before reaching the LLM agent. The plugin suppresses the default LLM response and routes the message to a Claude CLI instance running in a persistent tmux session. Claude processes the request and replies back through the same channel.
-
-This means zero token cost on the gateway agent, no message alteration, and no inference delay.
 
 ## Prerequisites
 
