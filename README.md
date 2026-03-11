@@ -17,15 +17,7 @@ Send `@cc` or `/cc` from any chat — your message is routed directly to Claude 
 
 ## How It Works
 
-```mermaid
-graph TD
-    A["Chat"] -->|"@cc message"| B["OpenClaw Gateway"]
-    B --> C["claude-bridge plugin"]
-    C -->|suppress LLM| B
-    C -->|execFile| D["Shell Script"]
-    D -->|tmux paste-buffer| E["Claude CLI / tmux"]
-    E -->|"openclaw message send"| A
-```
+<img alt="Architecture" src="https://mermaid.ink/img/Z3JhcGggVEQKICAgIEFbIkNoYXQiXSAtLT58IkBjYyBtZXNzYWdlInwgQlsiT3BlbkNsYXcgR2F0ZXdheSJdCiAgICBCIC0tPiBDWyJjbGF1ZGUtYnJpZGdlIHBsdWdpbiJdCiAgICBDIC0tPnxzdXBwcmVzcyBMTE18IEIKICAgIEMgLS0+fGV4ZWNGaWxlfCBEWyJTaGVsbCBTY3JpcHQiXQogICAgRCAtLT58dG11eCBwYXN0ZS1idWZmZXJ8IEVbIkNsYXVkZSBDTEkgLyB0bXV4Il0KICAgIEUgLS0+fCJvcGVuY2xhdyBtZXNzYWdlIHNlbmQifCBB" />
 
 1. User sends a prefixed message (e.g. `@cc deploy the app`)
 2. The plugin intercepts the message and suppresses the gateway LLM
