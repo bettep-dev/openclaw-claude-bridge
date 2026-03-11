@@ -18,6 +18,19 @@ const SILENT_PROMPT =
   "SYSTEM OVERRIDE: The previous user message was intercepted by the claude-bridge plugin and is already being handled externally. " +
   `You MUST NOT process, interpret, or respond to it. Output ONLY this exact text, nothing else: ${DELIVERY_MSG}`;
 
+/**
+ * Regex to match the OpenClaw metadata wrapper block precisely.
+ * Pattern: starts with "Conversation info" line, then a ```json code fence.
+ * This avoids breaking when user text itself contains triple backticks.
+ */
+const METADATA_RE = /^Conversation info.*?\n```json\n[\s\S]*?\n```/;
+
+/**
+ * Multiline fallback regex: detect prefix anywhere in the raw text.
+ * Used when metadata stripping fails but the prefix exists on some line.
+ */
+const PREFIX_MULTILINE_RE = /(^|\n)\s*[@\/](cc|ccn|ccu)\b/m;
+
 // NOTE: Single-user assumption — concurrent users may see cross-suppression
 let bridgeSuppressUntil = 0;
 
@@ -35,7 +48,15 @@ export default function register(api: OpenClawPluginApi) {
   api.on("before_prompt_build", async (event, ctx) => {
     const lastUserText = extractLastUserText(event.messages);
 
-    if (lastUserText && PREFIX_RE.test(lastUserText)) {
+    const prefixDetected =
+      !!lastUserText &&
+      (PREFIX_RE.test(lastUserText) || PREFIX_MULTILINE_RE.test(lastUserText));
+
+    api.logger.debug?.(
+      `[claude-bridge] before_prompt_build: prefixDetected=${prefixDetected}, extracted=${JSON.stringify(lastUserText?.slice(0, 120))}`,
+    );
+
+    if (prefixDetected) {
       bridgeSuppressUntil = Date.now() + EXEC_TIMEOUT + 5_000;
       return { systemPrompt: SILENT_PROMPT, prependContext: SILENT_PROMPT };
     }
@@ -44,7 +65,12 @@ export default function register(api: OpenClawPluginApi) {
   // --- Hook 2: message_sending (modifying) ---
   // Replace LLM output with delivery confirmation while bridge suppression is active
   api.on("message_sending", async (_event, _ctx) => {
-    if (Date.now() < bridgeSuppressUntil) {
+    const suppressing = Date.now() < bridgeSuppressUntil;
+    api.logger.debug?.(
+      `[claude-bridge] message_sending: suppressing=${suppressing}`,
+    );
+
+    if (suppressing) {
       return { content: DELIVERY_MSG };
     }
   });
@@ -59,6 +85,18 @@ export default function register(api: OpenClawPluginApi) {
     const command = match[1];
     const script = SCRIPT_MAP[command];
     if (!script) return;
+
+    api.logger.debug?.(
+      `[claude-bridge] message_received: command=${command}`,
+    );
+
+    // Safety net: set suppression if Hook 1 missed it
+    if (Date.now() >= bridgeSuppressUntil) {
+      bridgeSuppressUntil = Date.now() + EXEC_TIMEOUT + 5_000;
+      api.logger.debug?.(
+        `[claude-bridge] message_received: set bridgeSuppressUntil as safety net`,
+      );
+    }
 
     const arg = match[2].replace(/^"([\s\S]*)"$/, "$1").trim();
 
@@ -89,7 +127,13 @@ export default function register(api: OpenClawPluginApi) {
  * Extract the actual user message text from the last user message.
  * OpenClaw wraps Telegram messages with metadata:
  *   "Conversation info (untrusted metadata):\n```json\n{...}\n```\n\n@cc hello"
- * The real message is after the closing ``` block.
+ * The real message is after the closing metadata block.
+ *
+ * Handles:
+ * - Normal metadata wrapper with no backticks in user text
+ * - User text containing triple backticks (code blocks, link previews)
+ * - No metadata wrapper at all
+ * - Content as array of blocks (image + text, multi-block)
  */
 function extractLastUserText(messages: unknown): string | undefined {
   if (!Array.isArray(messages)) return undefined;
@@ -117,12 +161,13 @@ function extractLastUserText(messages: unknown): string | undefined {
     }
     if (!raw) continue;
 
-    // Strip metadata wrapper: everything before the closing ``` + blank lines
-    const metaEnd = raw.lastIndexOf("```");
-    if (metaEnd >= 0) {
-      const afterMeta = raw.slice(metaEnd + 3).trim();
+    // Strip metadata wrapper using precise pattern match
+    const metaMatch = raw.match(METADATA_RE);
+    if (metaMatch) {
+      const afterMeta = raw.slice(metaMatch[0].length).trim();
       if (afterMeta) return afterMeta;
     }
+
     return raw.trim();
   }
   return undefined;
