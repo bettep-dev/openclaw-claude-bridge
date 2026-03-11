@@ -23,7 +23,9 @@ fi
 sleep 0.5
 "$TMUX" send-keys -t "$SESSION" C-u
 sleep 0.3
-"$TMUX" send-keys -t "$SESSION" -l "[${CHANNEL}:${TARGET}] $MSG"
+printf '%s' "[${CHANNEL}:${TARGET}] $MSG" | "$TMUX" load-buffer -
+"$TMUX" paste-buffer -t "$SESSION" -d -p
+sleep 0.3
 "$TMUX" send-keys -t "$SESSION" Enter
 
 echo "✅ Delivered to Claude. Reply will arrive shortly."

@@ -4,28 +4,43 @@
 [![license](https://img.shields.io/npm/l/openclaw-claude-bridge)](LICENSE)
 [![node](https://img.shields.io/node/v/openclaw-claude-bridge)](package.json)
 
-Bridge OpenClaw messaging channels (Telegram, Discord, Slack, etc.) to Claude CLI via persistent tmux sessions.
+Bridge [OpenClaw](https://openclaw.ai) messaging channels to [Claude CLI](https://github.com/anthropics/claude-code) via persistent tmux sessions.
 
-Routes commands directly to the Claude CLI in your terminal, avoiding OAuth issues and separate API costs.
+Send `@cc` or `/cc` from any chat — your message is routed directly to Claude CLI running in your terminal, bypassing the gateway LLM entirely. No separate API keys, no OAuth, no extra costs.
 
-<img src="DEMO_1.png" alt="Telegram demo 1" width="400" /> 
-<img src="DEMO_2.png" alt="Telegram demo 2" width="400" />
+<p>
+  <img src="DEMO_1.png" alt="Telegram demo — sending a command" width="400" />
+  <img src="DEMO_2.png" alt="Telegram demo — receiving a response" width="400" />
+</p>
+
+> **⚠️ Telegram only.** This plugin has been developed and tested exclusively with the Telegram channel. Other channels (Discord, Slack, etc.) may use different message formats or metadata wrapping that could break prefix detection or LLM suppression. Community contributions for additional channels are welcome — please open an issue if you encounter problems.
 
 ## How It Works
 
-Messages prefixed with `@cc` or `/cc` are intercepted by an OpenClaw **plugin** before reaching the LLM agent. The plugin suppresses the default LLM response and routes the message to a Claude CLI instance running in a persistent tmux session. Claude processes the request and replies back through the same channel.
+```mermaid
+graph TD
+    A["Chat"] -->|"@cc message"| B["OpenClaw Gateway"]
+    B --> C["claude-bridge plugin"]
+    C -->|suppress LLM| B
+    C -->|execFile| D["Shell Script"]
+    D -->|tmux paste-buffer| E["Claude CLI / tmux"]
+    E -->|"openclaw message send"| A
+```
+
+1. User sends a prefixed message (e.g. `@cc deploy the app`)
+2. The plugin intercepts the message and suppresses the gateway LLM
+3. A shell script forwards the message to Claude CLI in a persistent tmux session
+4. Claude CLI replies back through the same channel via `openclaw message send`
 
 ## Prerequisites
 
-| Dependency                                              | Install                                  |
-| ------------------------------------------------------- | ---------------------------------------- |
-| [OpenClaw](https://openclaw.ai)                         | `npm i -g openclaw`                      |
-| [Claude CLI](https://github.com/anthropics/claude-code) | `npm i -g @anthropic-ai/claude-code`     |
-| [tmux](https://github.com/tmux/tmux)                    | Auto-installed during onboard if missing |
+| Dependency | Install |
+|---|---|
+| [OpenClaw](https://openclaw.ai) | `npm i -g openclaw` |
+| [Claude CLI](https://github.com/anthropics/claude-code) | `npm i -g @anthropic-ai/claude-code` |
+| [tmux](https://github.com/tmux/tmux) | Auto-installed during onboard if missing |
 
 > **Note:** macOS and Linux only. Windows is not supported (tmux dependency).
-
-> **Warning:** This plugin has only been tested with the **Telegram** channel. Other channels (Discord, Slack, etc.) may have different message formats or metadata wrapping, which could cause the prefix detection or LLM suppression to fail. If you encounter issues on other channels, please report them.
 
 ## Quick Start
 
@@ -34,62 +49,42 @@ npm i -g openclaw-claude-bridge
 openclaw-claude-bridge onboard
 ```
 
-The interactive wizard handles everything — plugin install, shell scripts, CLAUDE.md, daemon, and channel config.
+The interactive wizard configures everything — plugin, shell scripts, CLAUDE.md, daemon, and channel settings.
 
-Once complete, send `/cc hello` from your chat to verify the connection.
+Verify the connection:
+
+```
+@cc hello
+```
 
 ## Commands
 
-| Command                          | Description                              |
-| -------------------------------- | ---------------------------------------- |
-| `@cc message` or `/cc message`   | Send to existing session (keeps context) |
-| `@ccn message` or `/ccn message` | Start a new session (fresh context)      |
-| `@ccu` or `/ccu`                 | Show Claude usage info                   |
+| Prefix | Description |
+|---|---|
+| `@cc` · `/cc` | Send to the current session (retains conversation context) |
+| `@ccn` · `/ccn` | Start a fresh session (kills existing, creates new) |
+| `@ccu` · `/ccu` | Show Claude CLI usage stats |
 
-Quotes are not needed around messages:
-
-```
-/cc deploy the app to production
-@ccn refactor the auth module
-/ccu
-```
-
-## Architecture
+Messages are sent as-is — no quoting needed:
 
 ```
-               +---------------------------------+
-               |   LaunchAgent / systemd (30s)   |
-               |   runs claude-session.sh        |
-               +---------------+-----------------+
-                               | creates if missing
-                               v
-+--------+    +------------+   +-------------------+
-|  User  |--->|  OpenClaw  |-->|  tmux session     |
-| (chat) |    |  (plugin)  |   |  "claude-daemon"  |
-|        |<---|            |<--|  (Claude CLI)     |
-+--------+    +------------+   +-------------------+
+@cc refactor the auth module and add tests
+@ccn review this PR: https://github.com/org/repo/pull/42
+@ccu
 ```
 
-The plugin uses three hooks:
-
-| Hook                  | Purpose                                                                                                   |
-| --------------------- | --------------------------------------------------------------------------------------------------------- |
-| `before_prompt_build` | Detects prefix commands and overrides the system prompt to suppress the LLM                               |
-| `message_sending`     | Cancels the LLM's outgoing message for bridge-handled commands                                            |
-| `message_received`    | Executes the corresponding shell script (`claude-send.sh`, `claude-new-session.sh`, or `claude-usage.sh`) |
-
-A daemon (LaunchAgent on macOS, systemd on Linux) runs `claude-session.sh` every 30 seconds to keep the tmux session alive. Claude CLI responds via `openclaw message send` back through the originating channel.
+Multiline messages and special characters (`$`, `` ` ``, `\`, quotes) are preserved exactly as typed.
 
 ## Migration from v1
 
-v2.0 replaces the legacy skill/hook system with a single OpenClaw plugin. Migration is automatic:
+v2 replaces the legacy skill/hook system with a single OpenClaw plugin:
 
 ```bash
 npm i -g openclaw-claude-bridge
 openclaw-claude-bridge onboard
 ```
 
-The onboard wizard detects and removes legacy skills and hooks, then installs the plugin. No manual cleanup needed.
+The wizard detects and removes legacy components automatically.
 
 ## Uninstall
 
@@ -98,6 +93,14 @@ openclaw-claude-bridge uninstall
 ```
 
 Removes all installed components — plugin, shell scripts, CLAUDE.md additions, and daemon.
+
+## Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| LLM responds instead of delivery message | `openclaw gateway restart` |
+| Delivery confirmed but no reply | Check `tmux ls` — session may have crashed |
+| Multiline sends only first line | Re-run `openclaw-claude-bridge onboard` (v2.0.5+) |
 
 ## License
 

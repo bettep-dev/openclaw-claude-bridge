@@ -41,7 +41,9 @@ done
 
 # Send instruction
 sleep 1
-"$TMUX" send-keys -t "$SESSION" -l "[${CHANNEL}:${TARGET}] $MSG"
+printf '%s' "[${CHANNEL}:${TARGET}] $MSG" | "$TMUX" load-buffer -
+"$TMUX" paste-buffer -t "$SESSION" -d -p
+sleep 0.3
 "$TMUX" send-keys -t "$SESSION" Enter
 
 echo "✅ New session started. Reply will arrive shortly."
