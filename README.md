@@ -25,6 +25,8 @@ Messages prefixed with `@cc` or `/cc` are intercepted by an OpenClaw **plugin** 
 
 > **Note:** macOS and Linux only. Windows is not supported (tmux dependency).
 
+> **Warning:** This plugin has only been tested with the **Telegram** channel. Other channels (Discord, Slack, etc.) may have different message formats or metadata wrapping, which could cause the prefix detection or LLM suppression to fail. If you encounter issues on other channels, please report them.
+
 ## Quick Start
 
 ```bash
